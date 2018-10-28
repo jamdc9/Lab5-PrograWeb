@@ -25,51 +25,20 @@ app.get('/api/juegos/', function (req, res, next) {
     })
 });
 
-app.get('/api/juegos/:id', (req, res) => {
-    mongo.connect(url, function (err, db) {
-        const juegodb = db.db('juegos')
-        var cursor = juegosDB.collection('juegos').find({ id: parseInt(req.params.id) });
-        cursor.next(function (err, doc) {
-            if (doc) {
-                res.status(200).send(doc);
-            }
-            else {
-                res.status(404).send('ID brindado no se encontro')
-            }
-        });
-    })
+app.get('/api/juegos/:id', function (req, res, next) {
+    db.collection('juegos').find({id:parseInt(req.params.id)}).toArray((err, result) => {
+        res.send({juegos: result})
+    }) 
+    
 });
 
-var newID = 8
-app.post('/api/juegos', (req, res) => {
 
-    mongo.connect(url, function (err, db) {
-        const juegosdb = db.db('juegos')
-        var cursor = juegosdb.collection('juegos').find().sort({ id: -1 });
-
-        cursor.next(function (err, doc) {
-            if (doc) {
-                const juego = {
-                    id: doc.id + 1,
-                    name: req.body.name,
-                    consola: req.body.consola,
-                    comentario: req.body.comentario,
-                }
-                juegosdb.collection('juegos').insertOne(juego, function (err, result) {
-                    res.status(201).send("insertado exitosamente");
-                    db.close();
-                })
-
-            }
-        });
-    })
-
-});
 router.post('/api/juegos/', function (req, res, next) {
     const juego = {
         name: req.body.name,
         consola: req.body.consola,
         comentario: req.body.comentario,
+        avatar:req.body.avatar
     }
     db.collection('juegos').insertOne(juego, function (err, result) {
         assert.equal(null, err);
@@ -96,6 +65,7 @@ router.put('/api/juegos/:id', function (req, res, next) {
         name: req.body.name,
         consola: req.body.consola,
         comentario: req.body.comentario,
+        avatar:req.body.avatar
     }
 
     db.collection('juegos').updateOne({ "_id": objectId(id) }, { $set: item }, function (err, result) {
@@ -119,6 +89,7 @@ app.put('/api/juegos/:id', (req, res) => {
                         name: req.body.name,
                         consola: req.body.consola,
                         comentario: req.body.comentario,
+                        avatar:req.body.avatar
                     }
                 })
 
