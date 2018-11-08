@@ -17,7 +17,15 @@ mongo.connect(url, function (err, client) {
 app.listen(9090);
 
 console.log('Listening on port 9090...');
-//Code
+app.use(express.json())
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET,HEAD,POST,PUT")
+    next();
+});
+
+//Code   
 app.get('/api/juegos/', function (req, res, next) {
     db.collection('juegos').find().toArray((err, result) => {
         if (err) return console.log(err)
